@@ -47,6 +47,19 @@ RSpec.describe Comment, type: :model do
       expect(comment2.parent.replies[0]).to eq(comment2)
       expect(comment3.parent.replies[1]).to eq(comment3)
     end
+
+    context 'with order by' do
+      it 'returns comments in order by created at' do
+        first_comment = create(:comment)
+        last_comment = create(:comment, post: first_comment.post)
+
+        comments = described_class.by_created_at
+        expect(comments.count).to eq(2)
+        # Last created comment appears first by ordering
+        expect(comments[0].id).to eq(last_comment.id)
+        expect(comments[1].id).to eq(first_comment.id)
+      end
+    end
   end
 
   describe 'invalid' do

@@ -8,6 +8,6 @@ class CommentSerializer < ActiveModel::Serializer
   has_many :replies
 
   def replies
-    object.replies.by_created_at.limit(ENV.fetch("REPLIES_LIMIT"))
+    object.replies.by_created_at.limit(ENV.fetch('REPLIES_LIMIT').to_i)
   end
 end

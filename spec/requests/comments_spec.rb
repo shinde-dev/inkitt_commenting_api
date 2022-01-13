@@ -131,4 +131,93 @@ RSpec.describe 'Comments', type: :request do
       end
     end
   end
+
+  describe 'GET /index' do
+    context 'with valid post' do
+      it 'lists comments' do
+        first_comment = create(:comment)
+        last_comment = create(:comment, post: first_comment.post)
+
+        get api_v1_post_comments_url(first_comment.post.id), params: { page: 1 }
+
+        expect(response).to have_http_status(:ok)
+        json_response = JSON.parse(response.body)
+
+        expect(json_response.count).to eq(2)
+        # Last created comment appears first by ordering
+        expect(json_response[0]['id']).to eq(last_comment.id)
+        expect(json_response[1]['id']).to eq(first_comment.id)
+      end
+
+      it 'lists comments with replies' do
+        first_comment = create(:comment)
+        second_comment = create(:comment, post: first_comment.post, parent: first_comment)
+        get api_v1_post_comments_url(first_comment.post.id), params: { page: 1 }
+
+        expect(response).to have_http_status(:ok)
+        json_response = JSON.parse(response.body)
+        expect(json_response.count).to eq(1)
+        expect(json_response[0]['id']).to eq(first_comment.id)
+        expect(json_response[0]['replies'].count).to eq(1)
+        expect(json_response[0]['replies'][0]['id']).to eq(second_comment.id)
+      end
+
+      it 'lists top level comments i.e. without parents' do
+        first_comment = create(:comment)
+        create(:comment, post: first_comment.post, parent: first_comment)
+        get api_v1_post_comments_url(first_comment.post.id), params: { page: 1 }
+
+        expect(response).to have_http_status(:ok)
+        json_response = JSON.parse(response.body)
+        # Returns only one i.e. first comment which do not have a parent
+        expect(json_response.count).to eq(1)
+        expect(json_response[0]['id']).to eq(first_comment.id)
+      end
+
+      it 'lists comments with pagination' do
+        # create 3 comments with per page limit 2
+        first_comment = create(:comment)
+        create(:comment, post: first_comment.post)
+        create(:comment, post: first_comment.post)
+        expect(Comment.count).to eq(3)
+
+        # Page 1 will return 2 records
+        get api_v1_post_comments_url(first_comment.post.id), params: { page: 1 }
+        expect(response).to have_http_status(:ok)
+        json_response = JSON.parse(response.body)
+        expect(json_response.count).to eq(2)
+
+        # Page 2 will return 1 record only as we created only 3 records
+        get api_v1_post_comments_url(first_comment.post.id), params: { page: 2 }
+        expect(response).to have_http_status(:ok)
+        json_response = JSON.parse(response.body)
+        expect(json_response.count).to eq(1)
+      end
+
+      it 'does not returns error if no comments exist' do
+        get api_v1_post_comments_url(create(:post).id)
+
+        expect(response).to have_http_status(:ok)
+        json_response = JSON.parse(response.body)
+        expect(json_response.count).to eq(0)
+        expect(json_response).to eq([])
+      end
+    end
+
+    context 'with invalid post' do
+      it 'returns error with invalid post id' do
+        expect do
+          get api_v1_post_comments_url(123)
+        end
+          .to raise_error(ActiveRecord::RecordNotFound, 'Post does not exist')
+      end
+
+      it 'returns error with nil post' do
+        expect do
+          get api_v1_post_comments_url(nil)
+        end
+          .to raise_error(ActionController::UrlGenerationError)
+      end
+    end
+  end
 end

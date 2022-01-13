@@ -11,4 +11,5 @@ class Comment < ApplicationRecord
 
   # scopes
   scope :by_created_at, -> { order(created_at: :desc) }
+  scope :without_parent, -> { where(parent_id: nil) }
 end

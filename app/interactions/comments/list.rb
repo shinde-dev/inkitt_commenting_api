@@ -8,7 +8,7 @@ module Comments
     validates :post, presence: true
 
     def execute
-      post.comments.by_created_at.page(page)
+      post.comments.without_parent.by_created_at.page(page)
     end
   end
 end
