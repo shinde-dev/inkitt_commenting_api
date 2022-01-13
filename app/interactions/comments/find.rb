@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-module Posts
+module Comments
   class Find < ActiveInteraction::Base
     integer :id
 
     def execute
-      post = Post.find_by(id: id)
+      comment = Comment.find_by(id: id)
 
-      post || errors.add(:base, 'Post does not exist')
+      comment || errors.add(:base, 'Comment does not exist')
     end
   end
 end

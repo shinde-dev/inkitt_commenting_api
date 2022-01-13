@@ -3,6 +3,8 @@
 module Api
   module V1
     class CommentsController < ApplicationController
+      before_action :find_post!, only: :update
+
       def create
         inputs = { post: find_post! }.reverse_merge(comment_params)
         comment = Comments::Create.run(inputs)
@@ -14,13 +16,25 @@ module Api
         end
       end
 
+      def update
+        inputs = { comment: find_comment! }.reverse_merge(comment_params.except(:parent_id))
+        comment = Comments::Update.run(inputs)
+
+        if comment.valid?
+          render_response('updated', :ok, comment.result, CommentSerializer)
+        else
+          render_error_response(comment.errors.full_messages.to_sentence)
+        end
+      end
+
       private
 
       def find_post!
-        post = Posts::Find.run({ id: params[:post_id] })
-        raise ActiveRecord::RecordNotFound, post.errors.full_messages.to_sentence unless post.valid?
+        find_record!(Posts, params[:post_id])
+      end
 
-        post.result
+      def find_comment!
+        find_record!(Comments, params[:id])
       end
 
       def comment_params

@@ -21,7 +21,7 @@ RSpec.describe Posts::Find, type: :interactions do
 
       it 'returns error with invalid id value' do
         searched_post = described_class.run({ id: 123 })
-        expect(searched_post.errors.full_messages.to_sentence).to eq('Id does not exist')
+        expect(searched_post.errors.full_messages.to_sentence).to eq('Post does not exist')
       end
     end
   end
