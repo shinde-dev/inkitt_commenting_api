@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Post < ApplicationRecord
-  # asscociations
+  # associations
   has_many :comments, dependent: :nullify
 
   # validations

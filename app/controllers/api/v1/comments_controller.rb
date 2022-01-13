@@ -27,6 +27,11 @@ module Api
         end
       end
 
+      def index
+        comments = Comments::List.run(post: find_post!, page: params[:page]).result
+        render_response('success', :ok, comments, CommentSerializer)
+      end
+
       private
 
       def find_post!

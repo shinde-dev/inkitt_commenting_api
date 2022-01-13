@@ -18,6 +18,6 @@ module JsonResponses
   end
 
   def render_response(message, code, data, serializer)
-    render json: data, message: message, status: code, serializer: serializer
+    render json: data, message: message, status: code, each_serializer: serializer
   end
 end

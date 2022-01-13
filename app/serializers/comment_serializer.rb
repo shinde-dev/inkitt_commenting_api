@@ -5,4 +5,9 @@ class CommentSerializer < ActiveModel::Serializer
 
   belongs_to :post
   belongs_to :parent
+  has_many :replies
+
+  def replies
+    object.replies.by_created_at.limit(ENV.fetch("REPLIES_LIMIT"))
+  end
 end
