@@ -8,6 +8,10 @@ RSpec.describe Post, type: :model do
     it { is_expected.to have_db_column(:body).of_type(:text) }
   end
 
+  describe 'associations' do
+    it { is_expected.to have_many(:comments) }
+  end
+
   describe 'valid' do
     it 'is valid with valid attributes' do
       expect(create(:post)).to be_valid

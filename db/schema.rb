@@ -12,9 +12,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_220_106_175_145) do
+ActiveRecord::Schema.define(version: 20_220_106_183_446) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'plpgsql'
+
+  create_table 'comments', force: :cascade do |t|
+    t.text 'body', null: false
+    t.bigint 'post_id', null: false
+    t.bigint 'parent_id'
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['parent_id'], name: 'index_comments_on_parent_id'
+    t.index ['post_id'], name: 'index_comments_on_post_id'
+  end
 
   create_table 'posts', force: :cascade do |t|
     t.string 'title', null: false
@@ -22,4 +32,7 @@ ActiveRecord::Schema.define(version: 20_220_106_175_145) do
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
   end
+
+  add_foreign_key 'comments', 'comments', column: 'parent_id'
+  add_foreign_key 'comments', 'posts'
 end
