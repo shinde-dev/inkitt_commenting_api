@@ -1,24 +1,84 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Dependencies
+* Ruby version : 3.0.0
+* Rails Version : 6.1.4.1
+* Postgresql : 12.9
 
-Things you may want to cover:
+## Environment Configuration
+* Rename .env.example to .env and add values according to your local machine. Current values are set according to docker images.
 
-* Ruby version
+## Manually Testing APIs
+* Import postman collection added at root directory with file name Inkitt_commenting_api.postman_collection.json.
+* Change postman collection values, ids e.g. parameters as per your local DB values. As of now, the values and ids are added according to seeded data.
 
-* System dependencies
+## Setup with Docker
 
-* Configuration
+### Prerequisites
 
-* Database creation
+* Docker
+* Docker-Compose
 
-* Database initialization
+## Setup and start the applicaton with docker(use sudo with every docker command if you face permission issues)
 
-* How to run the test suite
+### Stop local postgres service to avoid default port conflicts
+```
+$ sudo service postgresql stop
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+### Build docker image
+```
+$ docker-compose build
+```
 
-* Deployment instructions
+### Setup database
+```
+$ docker-compose run web rails db:create db:migrate db:seed
+```
 
-* ...
+### Run the server
+```
+$ docker-compose up
+```
+
+### Run the Test Suit
+```
+$ docker-compose run web rspec
+```
+
+### Run the rubocop
+```
+$ docker-compose run web rubocop
+```
+
+## Setup and start the applicaton without Docker
+
+### Install Dependencies
+```
+$ gem install bundler && bundle install
+```
+
+### Setup database
+```
+$ rake db:create db:migrate && rake db:seed
+```
+
+### Run the server
+```
+$ rails s
+```
+
+### Run the Test Suit
+```
+$ rspec
+```
+
+### Run the rubocop
+```
+$ rubocop
+```
+
+## Future Enhancements
+* Using internationalisation gem I18n for translating application to a single custom language.
+* Apply cursor based pagination.
+* There is a scope of adding comment module serverless with NOSQL database. 
